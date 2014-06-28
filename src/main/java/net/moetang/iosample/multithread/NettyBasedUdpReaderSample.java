@@ -5,6 +5,7 @@ import io.netty.buffer.ByteBuf;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -38,9 +39,13 @@ public class NettyBasedUdpReaderSample {
                                 // process and send
                                 System.out.println("task " + finalI + ":" + Thread.currentThread() + " - " + raddr + " - " + unit.getByteBuf().readableBytes());
 
+                                if (unit.getByteBuf().readByte() != 1 || unit.getByteBuf().readByte() != 2) {
+                                    System.out.println("data error for task " + finalI);
+                                }
+
                                 ByteBuf sendBuf = unit.getByteBuf();
-                                NettyBufferUnit.prepareByteBufferToSend(sendBuf);
-                                //send
+                                //get ByteBuffer then send
+                                ByteBuffer sendBuffer = NettyBufferUnit.prepareByteBufferToSend(sendBuf);
                                 NettyBufferUnit.releaseSendByteBuf(sendBuf);
                             } else {
                                 System.out.println("addr is null for taks " + finalI);
