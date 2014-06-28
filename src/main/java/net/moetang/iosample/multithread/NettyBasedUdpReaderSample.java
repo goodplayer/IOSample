@@ -42,6 +42,8 @@ public class NettyBasedUdpReaderSample {
                                 NettyBufferUnit.prepareByteBufferToSend(sendBuf);
                                 //send
                                 NettyBufferUnit.releaseSendByteBuf(sendBuf);
+                            } else {
+                                System.out.println("addr is null for taks " + finalI);
                             }
                         } catch (IOException e) {
                             e.printStackTrace();
