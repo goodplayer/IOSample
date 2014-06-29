@@ -5,6 +5,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
+import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -23,25 +24,22 @@ public class UdpReaderSample {
 
         for (int i = 0; i < PARALLEL_LEVEL; i++) {
             final int finalI = i;
-            pool.submit(new Runnable() {
-                @Override
-                public void run() {
-                    ByteBuffer buffer = ByteBuffer.allocateDirect(2000);
-                    buffer.clear();
-                    while (true) {
-                        try {
-                            SocketAddress raddr = channel.receive(buffer);
-                            if (raddr != null) {
-                                buffer.flip();
-                                // process and send
-                                System.out.println("task " + finalI + " - " + raddr);
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            break;
-                        } finally {
-                            buffer.clear();
+            pool.submit((Runnable) () -> {
+                ByteBuffer buffer = ByteBuffer.allocateDirect(2000);
+                buffer.clear();
+                while (true) {
+                    try {
+                        SocketAddress raddr = channel.receive(buffer);
+                        if (raddr != null) {
+                            buffer.flip();
+                            // process and send
+                            System.out.println("task " + finalI + " - " + raddr);
                         }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        break;
+                    } finally {
+                        buffer.clear();
                     }
                 }
             });

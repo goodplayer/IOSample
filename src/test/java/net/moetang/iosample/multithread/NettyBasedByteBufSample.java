@@ -2,6 +2,7 @@ package net.moetang.iosample.multithread;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.buffer.Unpooled;
 
 import java.nio.ByteBuffer;
 
@@ -46,7 +47,12 @@ public class NettyBasedByteBufSample {
         System.out.println(byteBuf.refCnt());
         byteBuf.release();
         System.out.println(byteBuf.refCnt());
-        byteBuf.release();
+//        byteBuf.release();
+
+        ByteBuf test = Unpooled.buffer();
+        System.out.println(test.refCnt());
+        test.release();
+        System.out.println(test.refCnt());
     }
 
     private static void print(ByteBuffer buffer, ByteBuf buf) {
