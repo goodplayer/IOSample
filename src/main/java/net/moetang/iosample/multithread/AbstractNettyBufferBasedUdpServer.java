@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.channels.DatagramChannel;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -24,6 +25,8 @@ public abstract class AbstractNettyBufferBasedUdpServer {
 
     // for performance, not use volatile
     private boolean STOP = false;
+
+    private final CountDownLatch stopLatch = new CountDownLatch(1);
 
     protected AbstractNettyBufferBasedUdpServer(
             int parallelLevel,
@@ -94,9 +97,14 @@ public abstract class AbstractNettyBufferBasedUdpServer {
             this.STOP = true;
             this.channel.close();
             this.executorService.shutdown();
+            this.stopLatch.countDown();
         } catch (IOException e) {
             LOGGER.error("stop service error!", e);
         }
+    }
+
+    public void sync() throws InterruptedException {
+        this.stopLatch.await();
     }
 
 }
